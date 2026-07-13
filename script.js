@@ -12,7 +12,7 @@
    Leave as "" only if frontend + backend are served from the
    exact same domain (rare with Netlify + PythonAnywhere/Render).
 */
-const API_BASE = "https://YOUR-BACKEND-URL-HERE";
+const API_BASE = "https://plotx-dmv2.onrender.com";
 
 const AUTH_KEY = "px_admin_token";       // now stores the JWT, not just "true"
 const LEADS_CACHE_KEY = "px_leads_cache"; // only used to avoid re-fetching leads every click
