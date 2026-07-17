@@ -8,17 +8,13 @@ from functools import wraps
 
 app = Flask(__name__)
 
-# CORS: allow your Netlify frontend to call these /api/* routes.
-# "*" works everywhere while testing; once your Netlify domain is live,
-# replace "*" with e.g. "https://your-site.netlify.app" for tighter security.
+
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-# SECRET_KEY should come from an environment variable in production.
-# Falls back to a dev-only value so local testing still works.
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-only-change-me')
 
-# DATABASE_URL falls back to a local SQLite file if not set (e.g. local dev,
-# or PythonAnywhere where you just want a plain SQLite file on disk).
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///plotx.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -28,7 +24,7 @@ db = SQLAlchemy(app)
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 
-# ─── Models ───────────────────────────────────────────────────────────────────
+
 
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -98,7 +94,7 @@ class Lead(db.Model):
         }
 
 
-# ─── Auth Helpers ──────────────────────────────────────────────────────────────
+
 
 def token_required(f):
     @wraps(f)
