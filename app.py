@@ -7,7 +7,7 @@ import jwt, datetime, os
 from functools import wraps
 
 app = Flask(__name__)
-
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-fallback-change-me')
 
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
