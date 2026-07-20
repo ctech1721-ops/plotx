@@ -573,3 +573,145 @@ input[type="range"]{width:100%;accent-color:var(--gold);margin-bottom:8px;}
   .topbar{padding:8px 16px;font-size:.7rem;}
   .why-us-grid{grid-template-columns:1fr;}
 }
+
+
+
+/* ======================================================
+   ENHANCED MOBILE RESPONSIVENESS (additions)
+====================================================== */
+
+/* ---------- Tablet / small laptop (≤960px) extra fixes ---------- */
+@media(max-width:960px){
+  .main-header{padding:14px 20px;}
+  .main-nav{
+    width:100%;
+    order:3;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    flex-wrap:nowrap;
+    gap:8px;
+    padding-bottom:4px;
+  }
+  .main-nav::-webkit-scrollbar{height:4px;}
+  .nav-link{flex:0 0 auto;}
+  .directory-heading{flex-direction:column;align-items:flex-start;}
+  .admin-grid{grid-template-columns:1fr;}
+}
+
+/* ---------- Mobile (≤600px) ---------- */
+@media(max-width:600px){
+
+  html{font-size:15px;}
+
+  /* Topbar: stack and shrink */
+  .topbar{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:6px;
+    font-size:.68rem;
+  }
+  .topbar-left{
+    display:flex;flex-direction:column;gap:4px;
+  }
+  .topbar-left .sep{display:none;}
+  .topbar-right{width:100%;justify-content:flex-start;flex-wrap:wrap;}
+
+  /* Header / nav */
+  .main-header{
+    flex-direction:column;
+    align-items:stretch;
+    gap:10px;
+  }
+  .logo-block{justify-content:center;text-align:center;}
+  .logo-text h1{font-size:1.15rem;}
+  .dashboard-btn{width:100%;text-align:center;}
+  .main-nav{
+    justify-content:flex-start;
+  }
+  .nav-link{font-size:.78rem;padding:9px 12px;}
+
+  /* Hero */
+  .hero{padding:20px;border-radius:14px;gap:24px;}
+  .hero-title{font-size:1.5rem;}
+  .hero-desc{font-size:.85rem;}
+  .purpose-buttons{flex-direction:column;}
+  .purpose-btn{width:100%;min-width:0;}
+  .hero-image-card{min-height:220px;}
+
+  /* Why Us */
+  .why-us-grid{grid-template-columns:1fr;gap:14px;}
+  .why-us-card{padding:20px 16px;}
+
+  /* Directory / search */
+  .directory-heading h2{font-size:1.25rem;}
+  .search-box{padding:16px;border-radius:12px;}
+  #searchInput{font-size:.85rem;padding:12px 14px;}
+  .filter-btns{gap:6px;}
+  .filter-btn{padding:8px 11px;font-size:.74rem;}
+  .results-row{flex-direction:column;gap:4px;}
+
+  /* Listing cards */
+  .listing-grid{grid-template-columns:1fr;gap:16px;}
+  .listing-img-wrap{height:170px;}
+  .card-actions{flex-direction:column;}
+
+  /* JV Center */
+  .jv-banner{padding:20px;border-radius:12px;}
+  .jv-banner h2{font-size:1.3rem;}
+  .jv-cards{grid-template-columns:1fr;}
+  .estimator-header-box{padding:16px 18px;}
+  .jv-step-box{padding:18px;}
+
+  /* Cost Estimator */
+  .estimator-hero{padding:26px 18px;}
+  .estimator-hero h2{font-size:1.2rem;}
+  .estimator-config, .estimator-output{margin:0 14px;padding:20px;}
+  .tier-btns{grid-template-columns:repeat(2,1fr);}
+  .est-row{flex-direction:column;align-items:flex-start;gap:4px;}
+  .est-total{flex-direction:row;justify-content:space-between;}
+
+  /* About */
+  .about-hero{padding:26px 18px;}
+  .about-hero h2{font-size:1.4rem;}
+  .about-grid{padding:20px;}
+  .about-contact{position:static;margin-top:20px;}
+  .about-btns{flex-direction:column;}
+  .about-btns button{min-width:0;}
+
+  /* Admin login */
+  .admin-login-card{padding:26px 20px;}
+
+  /* Admin dashboard */
+  .admin-top{flex-direction:column;align-items:stretch;}
+  .admin-top button{width:100%;}
+  .admin-stats{grid-template-columns:1fr;gap:12px;}
+  .admin-subnav{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;}
+  .admin-tab{flex:0 0 auto;}
+  .admin-side-head{flex-direction:column;align-items:flex-start;}
+
+  /* Leads table: allow horizontal scroll, don't break layout */
+  .leads-table-wrap{padding:4px;}
+  .leads-table{font-size:.76rem;}
+
+  /* Upload form */
+  .listing-form{padding:18px;}
+  .form-row{grid-template-columns:1fr;}
+  .banner-preview-wrap img{height:180px;}
+  .banner-btn-row{flex-direction:column;}
+  .banner-btn-row button{width:100%;}
+
+  /* Enquiry modal */
+  .modal-card{padding:22px;max-width:100%;}
+
+  /* Footer */
+  .site-footer{font-size:.72rem;padding:16px;}
+}
+
+/* ---------- Extra-small phones (≤380px) ---------- */
+@media(max-width:380px){
+  .logo-text h1{font-size:1rem;}
+  .logo-text p{font-size:.55rem;}
+  .hero-title{font-size:1.3rem;}
+  .tier-btns{grid-template-columns:1fr 1fr;}
+  .stat-card b{font-size:1.5rem;}
+}
