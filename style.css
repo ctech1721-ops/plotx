@@ -652,11 +652,26 @@ input[type="range"]{width:100%;accent-color:var(--gold);margin-bottom:8px;}
   .filter-btn{padding:8px 11px;font-size:.74rem;}
   .results-row{flex-direction:column;gap:4px;}
 
-  /* Listing cards */
-  .listing-grid{grid-template-columns:1fr;gap:16px;}
-  .listing-img-wrap{height:170px;}
-  .card-actions{flex-direction:row;}
-  .card-btn{padding:9px 6px;font-size:.72rem;}
+  /* Listing cards — compact horizontal layout on phone */
+  .listing-grid{grid-template-columns:1fr;gap:14px;}
+  .listing-card{display:flex;flex-direction:row;border-radius:14px;}
+  .listing-img-wrap{width:120px;min-width:120px;height:auto;}
+  .listing-img-wrap img{height:100%;}
+  .badge-purpose{font-size:.58rem;padding:3px 6px;top:6px;left:6px;}
+  .badge-cat{display:none;}
+  .badge-id{display:none;}
+  .badge-ratio{font-size:.62rem;padding:14px 6px 6px;}
+  .listing-body{padding:10px 12px;flex:1;min-width:0;}
+  .listing-body h3{font-size:.92rem;margin-bottom:2px;}
+  .listing-loc{font-size:.72rem;margin-bottom:6px;}
+  .listing-price-row{margin-bottom:6px;}
+  .listing-price-row .label{font-size:.6rem;}
+  .listing-price-row .price{font-size:1rem;}
+  .listing-area{display:none;}
+  .listing-desc{display:none;}
+  .tag-row{display:none;}
+  .card-actions{flex-direction:row;margin-top:8px;gap:6px;}
+  .card-btn{padding:8px 4px;font-size:.66rem;border-radius:24px;}
 
   /* JV Center */
   .jv-banner{padding:20px;border-radius:12px;}
