@@ -75,6 +75,8 @@ input,select,textarea{font-family:inherit;}
 .logo-block{display:flex;align-items:center;gap:12px;}
 .header-top-row{display:flex;align-items:center;justify-content:space-between;}
 .nav-toggle-btn{display:none;}
+.nav-drawer-close{display:none;}
+.nav-drawer-backdrop{display:none;}
 .logo-icon{
   width:52px;height:52px;background:var(--gold);
   border-radius:12px;display:flex;align-items:center;justify-content:center;
@@ -635,19 +637,50 @@ input[type="range"]{width:100%;accent-color:var(--gold);margin-bottom:8px;}
     color:var(--gold);font-size:1.2rem;line-height:1;
     padding:8px 14px;border-radius:8px;
   }
-  .main-nav{
-    display:none;
-    flex-direction:column;
-    justify-content:flex-start;
-    gap:6px;
-    order:1;
-    width:auto;
-    overflow-x:visible;
-    flex-wrap:wrap;
+
+  /* Dimmed backdrop behind the drawer */
+  .nav-drawer-backdrop{
+    display:block;
+    position:fixed;inset:0;
+    background:rgba(0,0,0,0);
+    pointer-events:none;
+    transition:background .25s ease;
+    z-index:998;
   }
-  .main-nav.show{display:flex;}
-  .nav-link{font-size:.85rem;padding:12px 14px;text-align:left;flex:none;}
-  .dashboard-btn{order:2;}
+  .nav-drawer-backdrop.show{
+    background:rgba(0,0,0,.55);
+    pointer-events:auto;
+  }
+
+  /* Side drawer itself — slides in from the left */
+  .main-nav{
+    position:fixed;top:0;left:0;bottom:0;
+    width:78%;max-width:300px;
+    background:var(--green-900);
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:2px;
+    padding:70px 18px 24px;
+    transform:translateX(-100%);
+    transition:transform .28s ease;
+    z-index:999;
+    overflow-y:auto;
+    box-shadow:6px 0 24px rgba(0,0,0,.25);
+  }
+  .main-nav.show{transform:translateX(0);}
+  .nav-drawer-close{
+    display:block;
+    position:absolute;top:16px;right:16px;
+    width:34px;height:34px;
+    background:none;border:1px solid var(--green-700);
+    color:#fff;font-size:1.1rem;border-radius:8px;
+  }
+  .nav-link{
+    font-size:.9rem;padding:15px 10px;text-align:left;flex:none;
+    border-bottom:1px solid var(--green-700);border-radius:0;
+  }
+  .nav-link:last-child{border-bottom:none;}
 
   /* Hero */
   .hero{padding:20px;border-radius:14px;gap:24px;}
