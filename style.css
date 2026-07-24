@@ -648,8 +648,10 @@ input[type="range"]{width:100%;accent-color:var(--gold);margin-bottom:8px;}
   .directory-heading h2{font-size:1.25rem;}
   .search-box{padding:16px;border-radius:12px;}
   #searchInput{font-size:.85rem;padding:12px 14px;}
-  .filter-btns{gap:6px;}
-  .filter-btn{padding:8px 11px;font-size:.74rem;}
+  .filter-label{font-size:.72rem;margin-bottom:8px;}
+  .filter-group + .filter-group{margin-top:18px;}
+  .filter-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .filter-btn{padding:10px 6px;font-size:.76rem;border-radius:20px;text-align:center;}
   .results-row{flex-direction:column;gap:4px;}
 
   /* Listing cards — compact horizontal layout on phone */
