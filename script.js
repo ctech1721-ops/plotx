@@ -80,7 +80,6 @@ document.querySelectorAll(".purpose-btn").forEach(btn=>{
 let currentPurpose = "All Listings";
 let currentCategory = "All Types";
 let currentSearch = "";
-let currentBHK = "All";
 
 async function setPurposeFilter(value){
   currentPurpose = value;
@@ -97,14 +96,6 @@ async function setCategoryFilter(value){
   });
   await refreshAndRenderDirectory();
 }
-function setBHKFilter(value){
-  currentBHK = value;
-  document.querySelectorAll("#bhkFilters .filter-btn").forEach(b=>{
-    b.classList.toggle("active", b.dataset.bhk === value);
-    b.classList.toggle("gold-fill", b.dataset.bhk === value);
-  });
-  renderDirectory(); // BHK is a client-side filter over the feature tags, no need to refetch
-}
 
 document.querySelectorAll("#purposeFilters .filter-btn").forEach(btn=>{
   btn.addEventListener("click", ()=> setPurposeFilter(btn.dataset.purpose));
@@ -112,8 +103,15 @@ document.querySelectorAll("#purposeFilters .filter-btn").forEach(btn=>{
 document.querySelectorAll("#categoryFilters .filter-btn").forEach(btn=>{
   btn.addEventListener("click", ()=> setCategoryFilter(btn.dataset.category));
 });
-document.querySelectorAll("#bhkFilters .filter-btn").forEach(btn=>{
-  btn.addEventListener("click", ()=> setBHKFilter(btn.dataset.bhk));
+
+/* Mobile-only "Show Filters" toggle — the filter row itself is always
+   present and works the same on desktop; on phone screens it's collapsed
+   behind this button (see the .filter-toggle-btn media query in the CSS). */
+const filterToggleBtn = document.getElementById("filterToggleBtn");
+const filterRow = document.getElementById("filterRow");
+filterToggleBtn.addEventListener("click", ()=>{
+  const isOpen = filterRow.classList.toggle("show");
+  filterToggleBtn.textContent = isOpen ? "🔍 Hide Filters ▴" : "🔍 Show Filters ▾";
 });
 document.getElementById("searchInput").addEventListener("input", (e)=>{
   currentSearch = e.target.value.toLowerCase();
@@ -185,12 +183,6 @@ async function refreshAndRenderDirectory(){
   renderDirectory();
 }
 
-function extractBHK(features){
-  const joined = (features||[]).join(" ").toLowerCase();
-  const match = joined.match(/(\d+)\s*bhk/);
-  return match ? parseInt(match[1], 10) : null;
-}
-
 function renderDirectory(){
   const grid = document.getElementById("listingGrid");
   const all = getAllListings();
@@ -200,15 +192,7 @@ function renderDirectory(){
       item.title.toLowerCase().includes(currentSearch) ||
       (item.location||"").toLowerCase().includes(currentSearch) ||
       (item.features||[]).join(" ").toLowerCase().includes(currentSearch);
-
-    let bhkOk = true;
-    if(currentBHK !== "All"){
-      const wanted = parseInt(currentBHK, 10);
-      const actual = extractBHK(item.features);
-      bhkOk = wanted === 5 ? (actual !== null && actual >= 5) : actual === wanted;
-    }
-
-    return searchOk && bhkOk;
+    return searchOk;
   });
 
   document.getElementById("resultCount").textContent = filtered.length;
