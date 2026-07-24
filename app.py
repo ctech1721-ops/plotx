@@ -72,6 +72,12 @@ class Poster(db.Model):
         }
 
 
+class SiteSetting(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(50), unique=True, nullable=False)
+    value = db.Column(db.String(255), nullable=False)
+
+
 class Lead(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -124,6 +130,16 @@ def get_posters():
         q = q.filter_by(category=category)
     posters = q.order_by(Poster.created_at.desc()).all()
     return jsonify([p.to_dict() for p in posters])
+
+
+@app.route('/api/settings', methods=['GET'])
+def get_settings():
+    rows = SiteSetting.query.all()
+    settings = {row.key: row.value for row in rows}
+    return jsonify({
+        'logo': settings.get('logo'),
+        'banner': settings.get('banner')
+    })
 
 
 @app.route('/api/leads', methods=['POST'])
@@ -217,6 +233,53 @@ def delete_poster(identifier):
 def get_leads():
     leads = Lead.query.order_by(Lead.created_at.desc()).all()
     return jsonify([l.to_dict() for l in leads])
+
+
+def _save_setting_image(key):
+    if 'image' not in request.files or not request.files['image'].filename:
+        return jsonify({'error': 'No image provided'}), 400
+    f = request.files['image']
+    filename = secure_filename(f'{key}_{f.filename}')
+    path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    f.save(path)
+    url_path = f'/uploads/{filename}'
+
+    row = SiteSetting.query.filter_by(key=key).first()
+    if row:
+        row.value = url_path
+    else:
+        row = SiteSetting(key=key, value=url_path)
+        db.session.add(row)
+    db.session.commit()
+    return jsonify({key: url_path}), 200
+
+
+@app.route('/api/admin/settings/logo', methods=['POST'])
+@token_required
+def upload_logo():
+    return _save_setting_image('logo')
+
+
+@app.route('/api/admin/settings/logo', methods=['DELETE'])
+@token_required
+def reset_logo():
+    SiteSetting.query.filter_by(key='logo').delete()
+    db.session.commit()
+    return jsonify({'message': 'Logo reset to default'})
+
+
+@app.route('/api/admin/settings/banner', methods=['POST'])
+@token_required
+def upload_banner():
+    return _save_setting_image('banner')
+
+
+@app.route('/api/admin/settings/banner', methods=['DELETE'])
+@token_required
+def reset_banner():
+    SiteSetting.query.filter_by(key='banner').delete()
+    db.session.commit()
+    return jsonify({'message': 'Banner reset to default'})
 
 
 # ─── Init ──────────────────────────────────────────────────────────────────────
