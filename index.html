@@ -128,7 +128,9 @@
     <div class="search-box">
       <input type="text" id="searchInput" placeholder="🔍  Search by locations (e.g. OMR, ECR, Tambaram), size, features, or title...">
 
-      <div class="filter-row">
+      <button type="button" id="filterToggleBtn" class="filter-toggle-btn">🔍 Show Filters ▾</button>
+
+      <div class="filter-row" id="filterRow">
         <div class="filter-group">
           <span class="filter-label">▽ FILTER BY PURPOSE / LISTING TYPE:</span>
           <div class="filter-btns" id="purposeFilters">
@@ -148,17 +150,6 @@
             <button class="filter-btn" data-category="Commercial">🏢 Commercial</button>
             <button class="filter-btn" data-category="Industrial">🏭 Industrial</button>
             <button class="filter-btn" data-category="Raw Lands">🧭 Raw Lands</button>
-          </div>
-        </div>
-        <div class="filter-group">
-          <span class="filter-label">🛏️ FILTER BY BEDROOMS:</span>
-          <div class="filter-btns" id="bhkFilters">
-            <button class="filter-btn active gold-fill" data-bhk="All">All</button>
-            <button class="filter-btn" data-bhk="1 bhk">1 BHK</button>
-            <button class="filter-btn" data-bhk="2 bhk">2 BHK</button>
-            <button class="filter-btn" data-bhk="3 bhk">3 BHK</button>
-            <button class="filter-btn" data-bhk="4 bhk">4 BHK</button>
-            <button class="filter-btn" data-bhk="5 bhk">5+ BHK</button>
           </div>
         </div>
       </div>
