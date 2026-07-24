@@ -62,11 +62,26 @@ function goTo(target){
 }
 
 document.querySelectorAll(".nav-link").forEach(btn=>{
-  btn.addEventListener("click", ()=> goTo(btn.dataset.target));
+  btn.addEventListener("click", ()=>{
+    goTo(btn.dataset.target);
+    closeMobileNav();
+  });
 });
+
+/* Mobile hamburger menu — only affects phone-width screens (see CSS).
+   On desktop the nav is always visible and this button stays hidden. */
+const navToggleBtn = document.getElementById("navToggleBtn");
+const mainNav = document.getElementById("mainNav");
+navToggleBtn.addEventListener("click", ()=>{
+  mainNav.classList.toggle("show");
+});
+function closeMobileNav(){
+  mainNav.classList.remove("show");
+}
 
 document.getElementById("dashboardBtn").addEventListener("click", ()=>{
   goTo("admin");
+  closeMobileNav();
 });
 
 document.querySelectorAll(".purpose-btn").forEach(btn=>{
