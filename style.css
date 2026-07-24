@@ -664,12 +664,16 @@ input[type="range"]{width:100%;accent-color:var(--gold);margin-bottom:8px;}
   .listing-body{padding:10px 12px;flex:1;min-width:0;}
   .listing-body h3{font-size:.92rem;margin-bottom:2px;}
   .listing-loc{font-size:.72rem;margin-bottom:6px;}
-  .listing-price-row{margin-bottom:6px;}
+  .listing-price-row{margin-bottom:4px;}
   .listing-price-row .label{font-size:.6rem;}
   .listing-price-row .price{font-size:1rem;}
-  .listing-area{display:none;}
+  .listing-area{
+    background:none;padding:0;margin-bottom:4px;
+    font-size:.68rem;justify-content:flex-start;gap:4px;color:#5b6a5f;
+  }
   .listing-desc{display:none;}
-  .tag-row{display:none;}
+  .tag-row{margin-bottom:6px;gap:4px;}
+  .feature-tag{font-size:.6rem;padding:2px 7px;}
   .card-actions{flex-direction:row;margin-top:8px;gap:6px;}
   .card-btn{padding:8px 4px;font-size:.66rem;border-radius:24px;}
 
