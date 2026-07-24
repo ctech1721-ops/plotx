@@ -1,9 +1,8 @@
 /* ======================================================
    PLOT X REALTY — MAIN SCRIPT (API-connected version)
-   Listings, leads, and admin auth now go through the Flask
-   backend + SQL database instead of localStorage.
-   Logo/banner customization stays in localStorage since the
-   backend has no endpoints for those yet (cosmetic only, low risk).
+   Listings, leads, admin auth, and site logo/banner all go
+   through the Flask backend + SQL database now, so changes
+   are visible to every visitor, not just the admin's browser.
 ====================================================== */
 
 /* ---------- CONFIG ----------
@@ -16,9 +15,14 @@ const API_BASE = "https://plotx-dmv2.onrender.com";
 
 const AUTH_KEY = "px_admin_token";       // now stores the JWT, not just "true"
 const LEADS_CACHE_KEY = "px_leads_cache"; // only used to avoid re-fetching leads every click
-const BANNER_KEY = "px_hero_banner";
 const DEFAULT_BANNER = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=80";
-const LOGO_KEY = "px_site_logo";
+
+// Turns a relative "/uploads/xxx.jpg" path from the API into a full URL.
+function resolveAssetUrl(path) {
+  if (!path) return null;
+  if (path.startsWith("http")) return path;
+  return `${API_BASE}${path}`;
+}
 
 /* In-memory cache of listings fetched from the API.
    Many functions in this app (search, preview, autopopulate)
@@ -361,10 +365,27 @@ document.getElementById("enquiryForm").addEventListener("submit", async (e)=>{
 });
 
 /* ======================================================
-   SITE LOGO (still localStorage — cosmetic, per-browser only)
+   SITE LOGO + HOMEPAGE HERO BANNER
+   Both now live on the backend (SiteSetting table + /uploads),
+   so a change made by the admin is visible to every visitor.
 ====================================================== */
-function applySavedLogo(){
-  const saved = localStorage.getItem(LOGO_KEY);
+let siteSettingsCache = { logo: null, banner: null };
+
+async function fetchSiteSettings(){
+  try{
+    const res = await fetch(`${API_BASE}/api/settings`);
+    if(!res.ok) throw new Error("Could not load settings");
+    siteSettingsCache = await res.json();
+  }catch(err){
+    console.error(err);
+    siteSettingsCache = { logo: null, banner: null };
+  }
+  applyLogo();
+  applyBanner();
+}
+
+function applyLogo(){
+  const saved = resolveAssetUrl(siteSettingsCache.logo);
   const headerImg = document.getElementById("headerLogoImg");
   const headerEmoji = document.getElementById("logoEmoji");
   const loginImg = document.getElementById("loginLogoImg");
@@ -382,72 +403,116 @@ function applySavedLogo(){
   }
 }
 
-let logoDraft = "";
+let logoFile = null;
 document.getElementById("logoFileInput").addEventListener("change", (e)=>{
   const file = e.target.files[0];
   if(!file) return;
+  logoFile = file;
   const reader = new FileReader();
   reader.onload = ()=>{
-    logoDraft = reader.result;
-    document.getElementById("logoPreviewBox").innerHTML = `<img src="${logoDraft}" alt="Logo preview">`;
+    document.getElementById("logoPreviewBox").innerHTML = `<img src="${reader.result}" alt="Logo preview">`;
   };
   reader.readAsDataURL(file);
 });
 
-document.getElementById("saveLogoBtn").addEventListener("click", ()=>{
-  if(!logoDraft){ alert("Please choose a logo image first."); return; }
-  try{ localStorage.setItem(LOGO_KEY, logoDraft); }
-  catch(err){ alert("This image is too large to save. Please choose a smaller image."); return; }
-  applySavedLogo();
-  const note = document.getElementById("logoSavedNote");
-  note.classList.remove("hidden");
-  setTimeout(()=> note.classList.add("hidden"), 2500);
+document.getElementById("saveLogoBtn").addEventListener("click", async ()=>{
+  if(!logoFile){ alert("Please choose a logo image first."); return; }
+  const fd = new FormData();
+  fd.append("image", logoFile);
+  try{
+    const res = await fetch(`${API_BASE}/api/admin/settings/logo`, {
+      method: "POST",
+      headers: authHeader(),
+      body: fd
+    });
+    if (res.status === 401) { logoutAndShowLogin(); return; }
+    if (!res.ok) throw new Error("Upload failed");
+    const data = await res.json();
+    siteSettingsCache.logo = data.logo;
+    applyLogo();
+    const note = document.getElementById("logoSavedNote");
+    note.classList.remove("hidden");
+    setTimeout(()=> note.classList.add("hidden"), 2500);
+  }catch(err){
+    console.error(err);
+    alert("Could not save the logo. Please try again.");
+  }
 });
 
-document.getElementById("resetLogoBtn").addEventListener("click", ()=>{
-  localStorage.removeItem(LOGO_KEY);
-  logoDraft = "";
-  document.getElementById("logoFileInput").value = "";
-  applySavedLogo();
+document.getElementById("resetLogoBtn").addEventListener("click", async ()=>{
+  try{
+    const res = await fetch(`${API_BASE}/api/admin/settings/logo`, {
+      method: "DELETE",
+      headers: authHeader()
+    });
+    if (res.status === 401) { logoutAndShowLogin(); return; }
+    siteSettingsCache.logo = null;
+    logoFile = null;
+    document.getElementById("logoFileInput").value = "";
+    applyLogo();
+  }catch(err){
+    console.error(err);
+    alert("Could not reset the logo. Please try again.");
+  }
 });
 
-/* ======================================================
-   HOMEPAGE HERO BANNER (still localStorage — cosmetic only)
-====================================================== */
-function applySavedBanner(){
-  const saved = localStorage.getItem(BANNER_KEY);
-  const img = saved || DEFAULT_BANNER;
+function applyBanner(){
+  const img = resolveAssetUrl(siteSettingsCache.banner) || DEFAULT_BANNER;
   document.getElementById("heroBannerImg").src = img;
   document.getElementById("bannerPreviewImg").src = img;
 }
 
-let bannerDraft = "";
+let bannerFile = null;
 document.getElementById("bannerFileInput").addEventListener("change", (e)=>{
   const file = e.target.files[0];
   if(!file) return;
+  bannerFile = file;
   const reader = new FileReader();
   reader.onload = ()=>{
-    bannerDraft = reader.result;
-    document.getElementById("bannerPreviewImg").src = bannerDraft;
+    document.getElementById("bannerPreviewImg").src = reader.result;
   };
   reader.readAsDataURL(file);
 });
 
-document.getElementById("saveBannerBtn").addEventListener("click", ()=>{
-  if(!bannerDraft){ alert("Please choose an image first."); return; }
-  try{ localStorage.setItem(BANNER_KEY, bannerDraft); }
-  catch(err){ alert("This image is too large to save. Please choose a smaller image."); return; }
-  document.getElementById("heroBannerImg").src = bannerDraft;
-  const note = document.getElementById("bannerSavedNote");
-  note.classList.remove("hidden");
-  setTimeout(()=> note.classList.add("hidden"), 2500);
+document.getElementById("saveBannerBtn").addEventListener("click", async ()=>{
+  if(!bannerFile){ alert("Please choose an image first."); return; }
+  const fd = new FormData();
+  fd.append("image", bannerFile);
+  try{
+    const res = await fetch(`${API_BASE}/api/admin/settings/banner`, {
+      method: "POST",
+      headers: authHeader(),
+      body: fd
+    });
+    if (res.status === 401) { logoutAndShowLogin(); return; }
+    if (!res.ok) throw new Error("Upload failed");
+    const data = await res.json();
+    siteSettingsCache.banner = data.banner;
+    applyBanner();
+    const note = document.getElementById("bannerSavedNote");
+    note.classList.remove("hidden");
+    setTimeout(()=> note.classList.add("hidden"), 2500);
+  }catch(err){
+    console.error(err);
+    alert("Could not save the banner image. Please try again.");
+  }
 });
 
-document.getElementById("resetBannerBtn").addEventListener("click", ()=>{
-  localStorage.removeItem(BANNER_KEY);
-  bannerDraft = "";
-  document.getElementById("bannerFileInput").value = "";
-  applySavedBanner();
+document.getElementById("resetBannerBtn").addEventListener("click", async ()=>{
+  try{
+    const res = await fetch(`${API_BASE}/api/admin/settings/banner`, {
+      method: "DELETE",
+      headers: authHeader()
+    });
+    if (res.status === 401) { logoutAndShowLogin(); return; }
+    siteSettingsCache.banner = null;
+    bannerFile = null;
+    document.getElementById("bannerFileInput").value = "";
+    applyBanner();
+  }catch(err){
+    console.error(err);
+    alert("Could not reset the banner image. Please try again.");
+  }
 });
 
 /* ======================================================
@@ -755,8 +820,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   await refreshAndRenderDirectory();
   recalcEstimator();
   refreshAutoPopulate();
-  applySavedBanner();
-  applySavedLogo();
+  await fetchSiteSettings();
   await showAdminView();
   generateNextId();
   updatePreview();
