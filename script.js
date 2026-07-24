@@ -68,16 +68,26 @@ document.querySelectorAll(".nav-link").forEach(btn=>{
   });
 });
 
-/* Mobile hamburger menu — only affects phone-width screens (see CSS).
-   On desktop the nav is always visible and this button stays hidden. */
+/* Mobile hamburger menu — slides in as a side drawer with a dimmed
+   backdrop (like a typical property-portal app menu). Only affects
+   phone-width screens; on desktop the nav is always visible inline
+   and none of this drawer styling applies (see CSS). */
 const navToggleBtn = document.getElementById("navToggleBtn");
 const mainNav = document.getElementById("mainNav");
-navToggleBtn.addEventListener("click", ()=>{
-  mainNav.classList.toggle("show");
-});
+const navDrawerBackdrop = document.getElementById("navDrawerBackdrop");
+const navDrawerClose = document.getElementById("navDrawerClose");
+
+function openMobileNav(){
+  mainNav.classList.add("show");
+  navDrawerBackdrop.classList.add("show");
+}
 function closeMobileNav(){
   mainNav.classList.remove("show");
+  navDrawerBackdrop.classList.remove("show");
 }
+navToggleBtn.addEventListener("click", openMobileNav);
+navDrawerClose.addEventListener("click", closeMobileNav);
+navDrawerBackdrop.addEventListener("click", closeMobileNav);
 
 document.getElementById("dashboardBtn").addEventListener("click", ()=>{
   goTo("admin");
