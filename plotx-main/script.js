@@ -555,7 +555,7 @@ async function fetchSiteSettings(){
 
 function applyLogo(){
   // Locked logo: always use the packaged asset, never a database-uploaded logo.
-  const fixedLogo = "assets/logo.svg";
+  const fixedLogo = "assets/logo.png";
   const headerImg = document.getElementById("headerLogoImg");
   const loginImg = document.getElementById("loginLogoImg");
   if(headerImg) headerImg.src = fixedLogo;
