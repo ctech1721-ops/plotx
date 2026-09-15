@@ -1,0 +1,6 @@
+[build]
+  command = ""
+  publish = "."
+
+[build.environment]
+  PYTHON_VERSION = ""
