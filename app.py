@@ -319,6 +319,9 @@ def token_required(f):
 
 
 # ─── Public Routes ─────────────────────────────────────────────────────────────
+@app.route('/')
+def home():
+    return send_from_directory('.', 'index.html')
 
 @app.route('/api/posters', methods=['GET'])
 def get_posters():
