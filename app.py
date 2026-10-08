@@ -1,4 +1,4 @@
-import os
+﻿import os
 import re
 import uuid
 import secrets
@@ -1425,6 +1425,26 @@ def admin_delete_banner(admin):
 with app.app_context():
 
     db.create_all()
+
+    # -----------------------------------------------------
+    # Safe schema upgrades for existing PostgreSQL database
+    # -----------------------------------------------------
+
+    try:
+
+        db.session.execute(
+            db.text(
+                "ALTER TABLE admin "
+                "ADD COLUMN IF NOT EXISTS created_at "
+                "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+            )
+        )
+
+        db.session.commit()
+
+    except Exception:
+
+        db.session.rollback()
 
     # -----------------------------------------------------
     # Make old phone column nullable if possible
