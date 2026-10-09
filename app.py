@@ -469,66 +469,6 @@ def token_required(func):
     @wraps(func)
     def decorated(*args, **kwargs):
 
-        auth_header = request.headers.get(
-            "Authorization"
-        )
-
-        if not auth_header:
-            return jsonify({
-                "error": "Authorization required"
-            }), 401
-
-        try:
-
-            parts = auth_header.split(" ")
-
-            if len(parts) != 2:
-                raise ValueError("Invalid token")
-
-            token = parts[1]
-
-            payload = jwt.decode(
-                token,
-                app.config["SECRET_KEY"],
-                algorithms=["HS256"]
-            )
-
-            if not payload.get("admin_id"):
-                raise ValueError("Invalid admin token")
-
-            admin = db.session.get(
-                Admin,
-                payload["admin_id"]
-            )
-
-            if not admin:
-                raise ValueError("Admin not found")
-
-            return func(
-                admin,
-                *args,
-                **kwargs
-            )
-
-        except Exception as e:
-
-            return jsonify({
-                "error": "Invalid or expired token"
-            }), 401
-
-    return decorated
-
-
-
-# =========================================================
-# ADMIN AUTH
-# =========================================================
-
-def token_required(func):
-
-    @wraps(func)
-    def decorated(*args, **kwargs):
-
         auth_header = request.headers.get("Authorization")
 
         if not auth_header:
@@ -571,6 +511,63 @@ def token_required(func):
             }), 401
 
     return decorated
+
+
+
+# =========================================================
+# USER AUTH
+# =========================================================
+
+def user_token_required(func):
+
+    @wraps(func)
+    def decorated(*args, **kwargs):
+
+        auth_header = request.headers.get("Authorization")
+
+        if not auth_header:
+            return jsonify({
+                "error": "Authorization required"
+            }), 401
+
+        try:
+            parts = auth_header.split()
+
+            if len(parts) != 2 or parts[0].lower() != "bearer":
+                raise ValueError("Invalid Authorization header")
+
+            token = parts[1]
+
+            payload = jwt.decode(
+                token,
+                app.config["SECRET_KEY"],
+                algorithms=["HS256"]
+            )
+
+            if payload.get("type") != "user":
+                raise ValueError("Invalid user token")
+
+            user_id = payload.get("user_id")
+
+            if not user_id:
+                raise ValueError("User ID missing")
+
+            user = db.session.get(User, user_id)
+
+            if user is None:
+                raise ValueError("User not found")
+
+            return func(user, *args, **kwargs)
+
+        except Exception:
+            app.logger.exception("User token validation failed")
+            return jsonify({
+                "error": "Invalid or expired token"
+            }), 401
+
+    return decorated
+
+
 
 
 
