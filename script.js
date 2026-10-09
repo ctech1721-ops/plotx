@@ -665,7 +665,13 @@ async function renderLeads(){
 
   try {
     const res = await fetch(`${API_BASE}/api/admin/leads`, { headers: authHeader() });
-    if (res.status === 401) { logoutAndShowLogin(); return; }
+   
+if (res.status === 401) {
+  console.error("Admin leads API returned 401. Token rejected by backend.");
+  note.textContent = "Authentication failed while loading leads. Check the backend logs.";
+  note.classList.remove("hidden");
+  return;
+}
     if (!res.ok) throw new Error("Failed to load leads");
     cachedLeads = await res.json();
   } catch (err) {
@@ -710,7 +716,13 @@ async function renderUsers(){
   const note = document.getElementById("noUsersNote");
   try {
     const res = await fetch(`${API_BASE}/api/admin/users`, { headers: authHeader() });
-    if (res.status === 401) { logoutAndShowLogin(); return; }
+   
+if (res.status === 401) {
+  console.error("Admin users API returned 401. Token rejected by backend.");
+  note.textContent = "Authentication failed while loading users. Check the backend logs.";
+  note.classList.remove("hidden");
+  return;
+}
     if (!res.ok) throw new Error("Failed to load users");
     cachedUsers = await res.json();
   } catch (err) {
