@@ -1530,6 +1530,18 @@ with app.app_context():
         db.session.rollback()
         app.logger.exception("Could not upgrade poster table schema")
 
+    try:
+        db.session.execute(
+            db.text(
+                "ALTER TABLE poster "
+                "ADD COLUMN IF NOT EXISTS public_id VARCHAR(255)"
+            )
+        )
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        app.logger.exception("Could not add poster.public_id column")
+
     # -----------------------------------------------------
     # Make old phone column nullable if possible
     # -----------------------------------------------------
