@@ -3,6 +3,7 @@ import re
 import uuid
 import secrets
 import datetime
+import logging
 import requests
 import jwt
 
@@ -951,6 +952,7 @@ def create_contact_account():
         db.session.commit()
     except Exception:
         db.session.rollback()
+        app.logger.exception("Get in Touch account save failed")
         return jsonify({"error": "We could not save your details right now. Please try again."}), 500
 
     return jsonify({
@@ -1511,6 +1513,22 @@ with app.app_context():
     except Exception:
 
         db.session.rollback()
+
+    # -----------------------------------------------------
+    # Add columns missing from older poster tables
+    # -----------------------------------------------------
+
+    try:
+        db.session.execute(
+            db.text(
+                "ALTER TABLE poster "
+                "ADD COLUMN IF NOT EXISTS image_url TEXT"
+            )
+        )
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        app.logger.exception("Could not upgrade poster table schema")
 
     # -----------------------------------------------------
     # Make old phone column nullable if possible
