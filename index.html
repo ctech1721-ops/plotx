@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="image" href="assets/logo.webp" type="image/webp">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261008">
+<link rel="stylesheet" href="style.css?v=20261010">
 </head>
 <body>
 
@@ -42,7 +42,7 @@
   </nav>
 
   <button class="enq-btn" id="hdrEnquiry" onclick="openEnquiry('')">Enquiry</button>
-      <button class="user-btn" id="userBtn"><span id="userLabel">Sign in</span></button>
+      <button class="user-btn" id="userBtn" aria-label="Open your account"><span id="userLabel">Account</span></button>
   <button class="dashboard-btn" id="dashboardBtn"><span id="dashboardLabel">Dashboard</span></button>
 </header>
 
@@ -401,6 +401,7 @@
     <div class="account-list">
       <div><span>Name</span><b id="acNameRow"></b></div>
       <div><span>Phone number</span><b id="acPhone"></b></div>
+      <div><span>Email</span><b id="acEmail"></b></div>
       <div><span>Member since</span><b id="acSince"></b></div>
     </div>
     <div class="account-actions">
@@ -494,13 +495,13 @@
           <h3>Registered Users (<span id="userCountLabel">0</span>)</h3>
           <button class="outline-btn small" id="refreshUsersBtn">Refresh</button>
         </div>
-        <p class="form-subtitle">Everyone who created an account or signed in on the website.</p>
+        <p class="form-subtitle">Visitors who submitted the Get in Touch form and created a website account.</p>
         <div class="leads-table-wrap">
           <table class="leads-table stack-table">
-            <thead><tr><th>NAME</th><th>MOBILE</th><th>EMAIL</th><th>JOINED</th><th>LAST LOGIN</th><th>LOGINS</th></tr></thead>
+            <thead><tr><th>NAME</th><th>MOBILE</th><th>EMAIL</th><th>JOINED</th></tr></thead>
             <tbody id="usersTableBody"></tbody>
           </table>
-          <p id="noUsersNote" class="empty-note hidden">No users have signed up yet.</p>
+          <p id="noUsersNote" class="empty-note hidden">No Get in Touch submissions yet.</p>
         </div>
       </div>
     </div>
@@ -626,29 +627,6 @@
   </div>
 </section>
 
-<!-- ============ SIGN IN / CREATE ACCOUNT ============ -->
-<div id="authModal" class="modal-overlay hidden">
-  <div class="modal-card">
-    <button class="modal-close" id="authClose" aria-label="Close">✕</button>
-    <h3 id="authTitle">Welcome back</h3>
-    <div class="auth-tabs">
-      <button type="button" class="active" data-mode="login">Sign in</button>
-      <button type="button" data-mode="signup">Create account</button>
-    </div>
-    <form id="authForm" novalidate>
-      <div id="a_nameRow" class="hidden"><label for="a_name">Your name</label><input type="text" id="a_name" placeholder="Full name" autocomplete="name"></div>
-      <label for="a_phone">Phone number</label>
-      <input type="tel" id="a_phone" placeholder="10-digit mobile number" inputmode="numeric" maxlength="10" autocomplete="tel-national">
-      <label for="a_pass">Password</label>
-      <input type="password" id="a_pass" placeholder="At least 6 characters" autocomplete="current-password">
-      <div id="a_confirmRow" class="hidden"><label for="a_confirm">Confirm password</label><input type="password" id="a_confirm" placeholder="Repeat password" autocomplete="new-password"></div>
-      <button type="submit" class="gold-btn wide" id="authSubmit">Sign in</button>
-      <p id="authError" class="login-error"></p>
-    </form>
-    <p class="auth-note">You stay signed in on this device until you log out.</p>
-  </div>
-</div>
-
 <!-- ============ LISTING DETAILS MODAL ============ -->
 <div id="listingDetailsModal" class="modal-overlay listing-details-overlay hidden">
   <button class="back-btn" onclick="closeListingDetails()">&larr; Back to Properties</button>
@@ -709,11 +687,7 @@
   <p>© 2026 Plot X Realty — Professional Real Estate Solutions. "From Plot to Perfection"</p>
 </footer>
 
-<!-- Firebase Phone OTP (client-side SMS authentication) -->
-<script src="firebase-config.js?v=20261008"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-<script src="script.js?v=20261007" defer></script>
-<script src="auth.js?v=20261009" defer></script>
+<script src="script.js?v=20261010" defer></script>
+<script src="auth.js?v=20261010" defer></script>
 </body>
 </html>

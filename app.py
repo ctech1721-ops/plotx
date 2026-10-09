@@ -244,7 +244,8 @@ class SiteUser(db.Model):
             "id": self.id,
             "name": self.name,
             "phone": self.phone,
-            "email": self.email
+            "email": self.email,
+            "created": self.created_at.isoformat() if self.created_at else None
         }
 
     def to_admin(self):
@@ -253,8 +254,8 @@ class SiteUser(db.Model):
             "name": self.name,
             "phone": self.phone,
             "email": self.email,
-            "created_at": self.created_at.isoformat()
-            if self.created_at else None
+            "created": self.created_at.isoformat() if self.created_at else None,
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
 
@@ -892,6 +893,71 @@ def verify_user_otp():
         "token": token,
         "user": user.to_public()
     })
+
+
+# =========================================================
+# GET IN TOUCH — CREATE / RESTORE A LIGHTWEIGHT WEBSITE ACCOUNT
+# =========================================================
+
+@app.route("/api/users/contact", methods=["POST"])
+def create_contact_account():
+    data = request.get_json(silent=True) or {}
+
+    name = str(data.get("name") or "").strip()
+    raw_phone = str(data.get("phone") or "").strip()
+    digits = re.sub(r"\D", "", raw_phone)
+    email = str(data.get("email") or "").strip().lower()
+
+    if not name:
+        return jsonify({"error": "Please enter your name."}), 400
+    if len(name) > 255:
+        return jsonify({"error": "Name is too long."}), 400
+    if digits.startswith("91") and len(digits) == 12:
+        digits = digits[2:]
+    elif digits.startswith("0") and len(digits) == 11:
+        digits = digits[1:]
+    if len(digits) != 10 or digits[0] not in "6789":
+        return jsonify({"error": "Enter a valid 10-digit Indian mobile number."}), 400
+    if email and (len(email) > 255 or not valid_email(email)):
+        return jsonify({"error": "Enter a valid email address or leave it blank."}), 400
+
+    # Store the mobile as ten digits so it remains compatible with existing rows.
+    user = SiteUser.query.filter(
+        (SiteUser.phone == digits) |
+        (SiteUser.phone == "+91" + digits) |
+        (SiteUser.phone == "0" + digits)
+    ).first()
+
+    if email:
+        email_owner = SiteUser.query.filter(db.func.lower(SiteUser.email) == email).first()
+        if email_owner and user and email_owner.id != user.id:
+            return jsonify({"error": "That email is already linked to another account. Please use another email."}), 409
+        if email_owner and not user and email_owner.phone:
+            return jsonify({"error": "That email is already linked to another account. Please use the registered mobile number."}), 409
+        if email_owner and not user:
+            user = email_owner
+
+    if not user:
+        user = SiteUser(name=name, phone=digits, email=email or None)
+        db.session.add(user)
+    else:
+        user.name = name
+        if not user.phone:
+            user.phone = digits
+        if email:
+            user.email = email
+
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        return jsonify({"error": "We could not save your details right now. Please try again."}), 500
+
+    return jsonify({
+        "success": True,
+        "token": _user_token(user),
+        "user": user.to_public()
+    }), 200
 
 
 # =========================================================

@@ -682,3 +682,34 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:0}
 }
 
 .otp-card select{appearance:auto;cursor:pointer}
+
+
+/* Get in Touch: compact mandatory popup while keeping the website visible behind it */
+#getInTouchModal.modal-overlay{
+  z-index:10000;
+  background:rgba(5,7,14,.38);
+  backdrop-filter:blur(1px);
+  -webkit-backdrop-filter:blur(1px);
+  padding:16px;
+}
+#getInTouchModal .get-in-touch-card{
+  width:min(100%,390px);
+  max-width:390px;
+  padding:24px 25px 20px;
+  border-radius:18px;
+  box-shadow:0 20px 55px rgba(0,0,0,.25);
+}
+#getInTouchModal .get-in-touch-card h3{font-size:1.65rem;margin-top:8px;margin-bottom:7px}
+#getInTouchModal .get-in-touch-card .modal-sub{font-size:.92rem;line-height:1.45;margin-bottom:10px}
+#getInTouchModal .get-in-touch-card label{display:block;font-weight:700;font-size:.85rem;margin:9px 0 4px;color:var(--forest)}
+#getInTouchModal .get-in-touch-card input{width:100%;box-sizing:border-box;margin:3px 0 7px;padding:10px 12px;border-radius:10px}
+#getInTouchModal .get-in-touch-card .auth-note{font-size:.75rem;line-height:1.4;margin-top:10px;color:var(--muted)}
+#getInTouchModal .get-in-touch-card .pill{font-size:.72rem}
+#getInTouchModal .get-in-touch-card .gold-btn{margin-top:7px;padding:11px 20px}
+.optional-label{font-weight:400;color:var(--muted)}
+.contact-success{color:#197447;font-weight:700;font-size:.9rem;margin-top:10px;min-height:1.2em}
+@media(max-width:480px){
+  #getInTouchModal.modal-overlay{padding:14px}
+  #getInTouchModal .get-in-touch-card{padding:21px 19px 17px;max-width:360px}
+  #getInTouchModal .get-in-touch-card h3{font-size:1.5rem}
+}

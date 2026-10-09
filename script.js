@@ -277,13 +277,7 @@ function openListingDetails(listingId){
   const item = getAllListings().find(l => l.id === listingId);
   if(!item) return;
 
-  // Property details are protected. Visitors can browse/search listings freely,
-  // but must sign in before a listing can be opened. After successful sign-in,
-  // auth.js calls the pending action and this same property opens automatically.
-  if(typeof window.requireUserSignIn === "function" && !localStorage.getItem("px_user_token")){
-    window.requireUserSignIn(()=>openListingDetails(listingId));
-    return;
-  }
+  // Visitors can open property details without signing in.
 
   const img = item.image && item.image.trim() ? optimizeImg(resolveAssetUrl(item.image), 1100) : DEFAULT_BANNER;
   const price = item.price || "0";
@@ -729,21 +723,23 @@ async function renderUsers(){
   document.getElementById("userCountLabel").textContent = cachedUsers.length;
   if(cachedUsers.length === 0){
     tbody.innerHTML = "";
-    note.textContent = "No users have signed up yet.";
+    note.textContent = "No Get in Touch submissions yet.";
     note.classList.remove("hidden");
     await updateAdminStats();
     return;
   }
   note.classList.add("hidden");
-  tbody.innerHTML = cachedUsers.map(u => `
+  tbody.innerHTML = cachedUsers.map(u => {
+    const phone = String(u.phone || "");
+    const tel = phone.startsWith("+") ? phone : `+91${phone}`;
+    return `
     <tr>
-      <td data-label="Name">${escapeHtml(u.name)}</td>
-      <td data-label="Mobile"><a href="tel:+91${escapeHtml(u.phone)}">+91 ${escapeHtml(u.phone)}</a></td>
+      <td data-label="Name">${escapeHtml(u.name || "—")}</td>
+      <td data-label="Mobile">${phone ? `<a href="tel:${escapeHtml(tel)}">${escapeHtml(phone.startsWith("+") ? phone : "+91 " + phone)}</a>` : "—"}</td>
       <td data-label="Email">${escapeHtml(u.email||"—")}</td>
-      <td data-label="Joined">${fmtDateTime(u.created)}</td>
-      <td data-label="Last login">${fmtDateTime(u.lastLogin)}</td>
-      <td data-label="Logins">${u.loginCount}</td>
-    </tr>`).join("");
+      <td data-label="Joined">${fmtDateTime(u.created || u.created_at)}</td>
+    </tr>`;
+  }).join("");
   await updateAdminStats();
 }
 
