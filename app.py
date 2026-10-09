@@ -1543,23 +1543,34 @@ with app.app_context():
         app.logger.exception("Could not add poster.public_id column")
 
     # -----------------------------------------------------
-    # Make old phone column nullable if possible
+    # -----------------------------------------------------
+    # Make optional site_user fields nullable on older databases.
+    # The Get in Touch route creates users without a password, so an
+    # older NOT NULL password_hash constraint can cause a database 500.
+    # Run each migration separately so one failed statement does not
+    # prevent the remaining compatibility fixes.
     # -----------------------------------------------------
 
-    try:
-
-        db.session.execute(
-            db.text(
-                "ALTER TABLE site_user "
-                "ALTER COLUMN phone DROP NOT NULL"
-            )
-        )
-
-        db.session.commit()
-
-    except Exception:
-
-        db.session.rollback()
+    for migration_sql, migration_label in (
+        (
+            "ALTER TABLE site_user ALTER COLUMN phone DROP NOT NULL",
+            "site_user.phone nullable",
+        ),
+        (
+            "ALTER TABLE site_user ALTER COLUMN email DROP NOT NULL",
+            "site_user.email nullable",
+        ),
+        (
+            "ALTER TABLE site_user ALTER COLUMN password_hash DROP NOT NULL",
+            "site_user.password_hash nullable",
+        ),
+    ):
+        try:
+            db.session.execute(db.text(migration_sql))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            app.logger.exception("Could not apply database migration: %s", migration_label)
 
     # -----------------------------------------------------
     # Create / update admin
