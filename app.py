@@ -1,4 +1,4 @@
-﻿import os
+import os
 import re
 import uuid
 import secrets
@@ -45,10 +45,14 @@ app = Flask(
 # CONFIG
 # =========================================================
 
-app.config["SECRET_KEY"] = os.environ.get(
-    "SECRET_KEY",
-    "plotx-change-this-secret-key"
-)
+SECRET_KEY = os.environ.get("SECRET_KEY")
+
+if not SECRET_KEY or len(SECRET_KEY) < 32:
+    raise RuntimeError(
+        "SECRET_KEY must be set to a strong secret in production"
+    )
+
+app.config["SECRET_KEY"] = SECRET_KEY
 
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
