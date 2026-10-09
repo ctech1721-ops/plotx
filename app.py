@@ -519,18 +519,17 @@ def token_required(func):
     return decorated
 
 
+
 # =========================================================
-# USER AUTH
+# ADMIN AUTH
 # =========================================================
 
-def user_token_required(func):
+def token_required(func):
 
     @wraps(func)
     def decorated(*args, **kwargs):
 
-        auth_header = request.headers.get(
-            "Authorization"
-        )
+        auth_header = request.headers.get("Authorization")
 
         if not auth_header:
             return jsonify({
@@ -538,11 +537,10 @@ def user_token_required(func):
             }), 401
 
         try:
+            parts = auth_header.split()
 
-            parts = auth_header.split(" ")
-
-            if len(parts) != 2:
-                raise ValueError("Invalid token")
+            if len(parts) != 2 or parts[0].lower() != "bearer":
+                raise ValueError("Invalid Authorization header format")
 
             token = parts[1]
 
@@ -552,33 +550,28 @@ def user_token_required(func):
                 algorithms=["HS256"]
             )
 
-            if payload.get("type") != "user":
-                raise ValueError("Invalid user token")
+            admin_id = payload.get("admin_id")
 
-            user = db.session.get(
-                SiteUser,
-                payload.get("user_id")
-            )
+            if not admin_id:
+                raise ValueError("Invalid admin token: admin_id missing")
 
-            if not user:
-                raise ValueError("User not found")
+            admin = db.session.get(Admin, admin_id)
 
-            return func(
-                user,
-                *args,
-                **kwargs
-            )
+            if admin is None:
+                raise ValueError("Admin not found")
 
-        
+            return func(admin, *args, **kwargs)
+
         except Exception:
-            app.logger.exception("Admin token validation failed")
+            app.logger.exception(
+                "Admin token validation failed"
+            )
             return jsonify({
                 "error": "Invalid or expired token"
             }), 401
 
-    
-
     return decorated
+
 
 
 # =========================================================
