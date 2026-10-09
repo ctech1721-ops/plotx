@@ -569,11 +569,14 @@ def user_token_required(func):
                 **kwargs
             )
 
+        
         except Exception:
-
+            app.logger.exception("Admin token validation failed")
             return jsonify({
                 "error": "Invalid or expired token"
             }), 401
+
+    
 
     return decorated
 
