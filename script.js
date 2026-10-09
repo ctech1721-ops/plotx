@@ -232,12 +232,14 @@ function buildCard(item){
     ? `<div class="badge-ratio">Ratio: ${item.landownerShare}% Landowner / ${item.developerShare || (100-item.landownerShare)}% Developer</div>`
     : "";
   const priceLabel = isJV ? "DEAL TYPE:" : (item.purpose === "Rent" || item.purpose === "Lease" ? "RENTAL VALUE:" : "FINANCIAL MATRIX:");
-  const img = item.image && item.image.trim()
-    ? optimizeImg(resolveAssetUrl(item.image), 700)
-    : FALLBACK_CARD_IMG;
-  const price = item.price || "0";
-  const description = item.description || "";
-  const features = item.features || [];
+ 
+const imagePath = item.image || item.image_url || "";
+const img = imagePath && imagePath.trim()
+  ? optimizeImg(resolveAssetUrl(imagePath), 700)
+  : FALLBACK_CARD_IMG;
+
+const price = item.price || item.price_range || "0";
+const description = item.description || "";
 
   return `
     <div class="listing-card" data-id="${item.id}" tabindex="0" role="button" aria-label="View details for ${escapeHtml(item.title)}">
