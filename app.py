@@ -179,14 +179,18 @@ class SiteSetting(db.Model):
         }
 
 
+
+
 class Lead(db.Model):
+    __tablename__ = "lead"
+
     id = db.Column(db.Integer, primary_key=True)
-
-    name = db.Column(db.String(255), nullable=True)
-    phone = db.Column(db.String(50), nullable=True)
+    name = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), nullable=True)
-    message = db.Column(db.Text, nullable=True)
-
+    mobile = db.Column(db.String(255), nullable=False)
+    interest = db.Column(db.String(255), nullable=True)
+    service = db.Column(db.String(255), nullable=True)
+    source_context = db.Column(db.String(255), nullable=True)
     created_at = db.Column(
         db.DateTime,
         default=datetime.datetime.utcnow
@@ -196,11 +200,15 @@ class Lead(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "phone": self.phone,
             "email": self.email,
-            "message": self.message,
-            "created_at": self.created_at.isoformat()
-            if self.created_at else None
+            "mobile": self.mobile,
+            "interest": self.interest,
+            "service": self.service,
+            "source_context": self.source_context,
+            "created_at": (
+                self.created_at.isoformat()
+                if self.created_at else None
+            )
         }
 
 
