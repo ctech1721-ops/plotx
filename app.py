@@ -134,9 +134,15 @@ class Admin(db.Model):
     )
 
 
+
 class Poster(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
+    category = db.Column(
+        db.String(255),
+        nullable=False,
+        default="Property"
+    )
     image_url = db.Column(db.Text, nullable=False)
     public_id = db.Column(db.String(255), nullable=True)
     created_at = db.Column(
@@ -148,11 +154,16 @@ class Poster(db.Model):
         return {
             "id": self.id,
             "title": self.title,
+            "category": self.category,
             "image_url": self.image_url,
             "public_id": self.public_id,
-            "created_at": self.created_at.isoformat()
-            if self.created_at else None
+            "created_at": (
+                self.created_at.isoformat()
+                if self.created_at else None
+            )
         }
+
+
 
 
 class SiteSetting(db.Model):
@@ -1230,38 +1241,34 @@ def uploaded_file(filename):
     )
 
 
+
 # =========================================================
 # ADMIN - POSTERS
 # =========================================================
 
-@app.route(
-    "/api/admin/posters",
-    methods=["POST"]
-)
+@app.route("/api/admin/posters", methods=["POST"])
 @token_required
 def admin_create_poster(admin):
 
-    title = request.form.get(
-        "title",
-        ""
-    ).strip()
-
-    image = request.files.get(
-        "image"
-    )
+    title = request.form.get("title", "").strip()
+    category = request.form.get("category", "").strip()
+    image = request.files.get("image")
 
     if not image:
-
         return jsonify({
             "error": "Image is required"
         }), 400
 
     if not title:
-
         title = "PlotX Property"
 
-    try:
+    # Your Supabase poster table requires category
+    if not category:
+        category = "Property"
 
+    result = None
+
+    try:
         result = cloudinary.uploader.upload(
             image,
             folder="plotx/posters"
@@ -1270,7 +1277,8 @@ def admin_create_poster(admin):
         poster = Poster(
             title=title,
             image_url=result.get("secure_url"),
-            public_id=result.get("public_id")
+            public_id=result.get("public_id"),
+            category=category
         )
 
         db.session.add(poster)
@@ -1282,15 +1290,24 @@ def admin_create_poster(admin):
         }), 201
 
     except Exception as e:
+        db.session.rollback()
 
-        print(
-            "CLOUDINARY ERROR:",
-            e
-        )
+        # Remove newly uploaded image if database save fails
+        if result and result.get("public_id"):
+            try:
+                cloudinary.uploader.destroy(
+                    result["public_id"]
+                )
+            except Exception:
+                pass
+
+        app.logger.exception("POSTER UPLOAD ERROR")
 
         return jsonify({
             "error": "Image upload failed"
         }), 500
+
+
 
 
 # =========================================================
