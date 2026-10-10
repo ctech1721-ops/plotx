@@ -235,6 +235,8 @@ function badgeClass(purpose) {
   return "badge-default";
 }
 
+const subcategory = item.sub_category || item.subcategory || "";
+
 function buildCard(item){
   const features = Array.isArray(item.features)
     ? item.features
@@ -276,7 +278,7 @@ return `
     <div class="listing-body">
       <h3>${escapeHtml(item.title)}</h3>
       <p class="listing-loc">${escapeHtml(item.location)}</p>
-      ${item.subcategory ? `<div class="listing-subcategory">${escapeHtml(item.subcategory)}</div>` : ""}
+      ${subcategory ? `<div class="listing-subcategory">${escapeHtml(subcategory)}</div>` : ""}
 
       <div class="listing-price-row">
         <span class="label">${priceLabel}</span>
@@ -348,7 +350,14 @@ const priceLabel = item.purpose === "Rent" || item.purpose === "Lease"
     ? "Deal Type"
     : "Financial Matrix";
 
-const features = Array.isArray(item.features) ? item.features : [];
+
+const features = Array.isArray(item.features)
+  ? item.features
+  : (typeof item.features === "string" && item.features.trim()
+      ? item.features.split(",").map(f => f.trim()).filter(Boolean)
+      : []);
+
+const subcategory = item.sub_category || item.subcategory || "";
 
 
   document.getElementById("listingDetailsContent").innerHTML = `
@@ -363,7 +372,7 @@ const features = Array.isArray(item.features) ? item.features : [];
       </div>
       <h2>${escapeHtml(item.title || "Property Details")}</h2>
       <p class="details-location">${escapeHtml(location)}</p>
-      ${item.subcategory ? `<div class="details-subcategory">${escapeHtml(item.subcategory)}</div>` : ""}
+      ${subcategory ? `<div class="details-subcategory">${escapeHtml(subcategory)}</div>` : ""}
       <div class="details-price-row"><span>${priceLabel}</span><strong>${price.match(/^[\d,]+$/) ? "₹"+price : escapeHtml(price)}</strong></div>
       <div class="details-area"><span>Total Area</span><strong>${escapeHtml(String(area))} sqft</strong></div>
       ${item.description ? `<div class="details-section"><h4>Property Description</h4><p>${escapeHtml(item.description)}</p></div>` : ""}
@@ -950,10 +959,16 @@ function buildDraftItem(){
   };
 }
 
-function updatePreview(){
-  const cardHtml = buildCard(buildDraftItem());
-  const innerHtml = cardHtml.replace(/^\s*<div class="listing-card"[^>]*>/, "").replace(/<\/div>\s*$/, "");
-  document.getElementById("previewCard").innerHTML = innerHtml;
+
+function updatePreview() {
+  const preview = document.getElementById("previewCard");
+  if (!preview) {
+    console.error("Preview element #previewCard not found");
+    return;
+  }
+
+  const item = buildDraftItem();
+  preview.innerHTML = buildCard(item);
 }
 
 document.getElementById("listingForm").addEventListener("submit", async (e)=>{
