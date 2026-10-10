@@ -224,6 +224,17 @@ if (searchInput) {
 
 /* ---------- BUILD LISTING CARD HTML ---------- */
 
+function badgeClass(purpose) {
+  const value = String(purpose || "").toLowerCase().trim();
+
+  if (value === "sale") return "badge-sale";
+  if (value === "rent") return "badge-rent";
+  if (value === "lease") return "badge-lease";
+  if (value === "joint venture") return "badge-jv";
+
+  return "badge-default";
+}
+
 function buildCard(item){
   const features = Array.isArray(item.features)
     ? item.features
