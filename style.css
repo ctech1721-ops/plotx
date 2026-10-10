@@ -713,3 +713,24 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:0}
   #getInTouchModal .get-in-touch-card{padding:21px 19px 17px;max-width:360px}
   #getInTouchModal .get-in-touch-card h3{font-size:1.5rem}
 }
+
+
+
+/* Property details image size */
+#listingDetailsContent img {
+  width: 100%;
+  max-height: 420px;
+  height: 420px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  background: #f5f1e8;
+}
+
+@media (max-width: 768px) {
+  #listingDetailsContent img {
+    height: 260px;
+    max-height: 260px;
+  }
+}
+
