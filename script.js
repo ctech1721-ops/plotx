@@ -291,7 +291,10 @@ function openListingDetails(listingId){
 
   // Visitors can open property details without signing in.
 
-  const img = item.image && item.image.trim() ? optimizeImg(resolveAssetUrl(item.image), 1100) : DEFAULT_BANNER;
+const imagePath = item.image || item.image_url || "";
+const img = imagePath && imagePath.trim()
+  ? optimizeImg(resolveAssetUrl(imagePath), 1100)
+  : DEFAULT_BANNER;
   const price = item.price || "0";
   const priceLabel = item.purpose === "Rent" || item.purpose === "Lease" ? "Rental Value" : (item.purpose === "Joint Venture" ? "Deal Type" : "Financial Matrix");
   const features = Array.isArray(item.features) ? item.features : [];
