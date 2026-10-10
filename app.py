@@ -150,18 +150,27 @@ class Poster(db.Model):
         default=datetime.datetime.utcnow
     )
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "title": self.title,
-            "category": self.category,
-            "image_url": self.image_url,
-            "public_id": self.public_id,
-            "created_at": (
-                self.created_at.isoformat()
-                if self.created_at else None
-            )
-        }
+    
+def to_dict(self):
+    return {
+        "id": self.id,
+        "title": self.title,
+        "category": self.category,
+        "image_url": self.image_url,
+        "public_id": self.public_id,
+        "created_at": (
+            self.created_at.isoformat()
+            if self.created_at else None
+        ),
+        "location": getattr(self, "location", None),
+        "purpose": getattr(self, "purpose", None),
+        "price": getattr(self, "price", None),
+        "area": getattr(self, "area", None),
+        "description": getattr(self, "description", None),
+        "sub_category": getattr(self, "sub_category", None),
+        "features": getattr(self, "features", None)
+    }
+
 
 
 
