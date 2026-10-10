@@ -342,22 +342,44 @@ function closeListingDetails(){
   document.body.classList.remove("modal-open");
 }
 
+
 function bindListingCardClicks(){
   const grid = document.getElementById("listingGrid");
   if(!grid || grid.dataset.detailBound === "1") return;
+
   grid.dataset.detailBound = "1";
-  grid.addEventListener("click", (e)=>{
-    if(e.target.closest("a, button")) return;
+
+  grid.addEventListener("click", (e) => {
+    const viewButton = e.target.closest(".view-btn, .view-details, .mobile-view-details");
+
+    if (viewButton) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const card = viewButton.closest(".listing-card");
+      if (card) openListingDetails(card.dataset.id);
+
+      return;
+    }
+
+    if (e.target.closest("a, button")) return;
+
     const card = e.target.closest(".listing-card");
-    if(card) openListingDetails(card.dataset.id);
+    if (card) openListingDetails(card.dataset.id);
   });
-  grid.addEventListener("keydown", (e)=>{
-    if(e.key !== "Enter" && e.key !== " ") return;
-    if(e.target.closest("a, button")) return;
+
+  grid.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    if (e.target.closest("a, button")) return;
+
     const card = e.target.closest(".listing-card");
-    if(card){ e.preventDefault(); openListingDetails(card.dataset.id); }
+    if (card) {
+      e.preventDefault();
+      openListingDetails(card.dataset.id);
+    }
   });
 }
+
 
 function initListingDetailsModal(){
   bindListingCardClicks();
