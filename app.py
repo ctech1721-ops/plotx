@@ -718,14 +718,24 @@ def create_lead():
     ) or {}
 
     lead = Lead(
-        name=data.get("name"),
-        phone=data.get("phone"),
-        email=data.get("email"),
-        message=data.get("message")
+        name=str(data.get("name") or "").strip(),
+        mobile=str(data.get("mobile") or data.get("phone") or "").strip(),
+        email=(str(data.get("email") or "").strip() or None),
+        interest=str(data.get("interest") or "General Enquiry").strip(),
+        service=str(data.get("service") or "General").strip(),
+        source_context=str(data.get("message") or data.get("context") or "").strip()
     )
 
+    if not lead.name or not lead.mobile:
+        return jsonify({"success": False, "error": "Name and mobile number are required."}), 400
+
     db.session.add(lead)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        app.logger.exception("Enquiry submission failed")
+        return jsonify({"success": False, "error": "Could not save enquiry. Please try again."}), 500
 
     return jsonify({
         "success": True,
@@ -1404,6 +1414,21 @@ def admin_leads(admin):
         lead.to_dict()
         for lead in leads
     ])
+
+
+@app.route("/api/admin/clear-leads-users", methods=["DELETE"])
+@token_required
+def admin_clear_leads_users(admin):
+    """Delete lead and website-account records only; preserve listings and site content."""
+    try:
+        Lead.query.delete(synchronize_session=False)
+        SiteUser.query.delete(synchronize_session=False)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Leads and users cleared."})
+    except Exception:
+        db.session.rollback()
+        app.logger.exception("Failed to clear leads and users")
+        return jsonify({"success": False, "error": "Could not clear leads and users."}), 500
 
 
 # =========================================================

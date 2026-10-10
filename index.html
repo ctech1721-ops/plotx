@@ -29,6 +29,7 @@
       <img class="wordmark" src="assets/wordmark-clean.png" alt="Plot X Realty - Professional Real Estate Solutions" height="54">
     </div>
     <button class="nav-toggle-btn" id="navToggleBtn" aria-label="Toggle menu">☰</button>
+    <button class="user-btn" id="userBtn" aria-label="Open your account"><span id="userLabel">Account</span></button>
   </div>
 
   <div class="nav-drawer-backdrop" id="navDrawerBackdrop"></div>
@@ -39,11 +40,10 @@
     <button class="nav-link" data-target="jv">Joint Venture Center</button>
     <button class="nav-link" data-target="estimator">Cost Estimators</button>
     <button class="nav-link" data-target="about">About Us</button>
+    <button class="dashboard-btn drawer-dashboard-btn" id="dashboardBtn"><span id="dashboardLabel">Dashboard</span></button>
   </nav>
 
   <button class="enq-btn" id="hdrEnquiry" onclick="openEnquiry('')">Enquiry</button>
-      <button class="user-btn" id="userBtn" aria-label="Open your account"><span id="userLabel">Account</span></button>
-  <button class="dashboard-btn" id="dashboardBtn"><span id="dashboardLabel">Dashboard</span></button>
 </header>
 
 <!-- ============ HOME / HERO ============ -->
@@ -436,7 +436,10 @@
         <h2>Admin Dashboard</h2>
         <p>Manage enquiries, published listings, and post new properties.</p>
       </div>
-      <button class="outline-btn" id="logoutBtn">Logout &amp; lock</button>
+      <div class="admin-header-actions">
+        <button class="outline-btn small danger-outline" id="clearLeadsUsersBtn" type="button">Clear Leads &amp; Users</button>
+        <button class="outline-btn" id="logoutBtn">Logout &amp; lock</button>
+      </div>
     </div>
 
     <!-- STAT CARDS -->

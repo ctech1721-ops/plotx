@@ -629,11 +629,12 @@ document.getElementById("enquiryForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
   const lead = {
     name: document.getElementById("e_name").value.trim(),
-    email: document.getElementById("e_email").value.trim() || "—",
+    email: document.getElementById("e_email").value.trim(),
     mobile: document.getElementById("e_mobile").value.trim(),
-    interest: document.getElementById("e_interest").value,
-    service: document.getElementById("e_service").value,
-    context: document.getElementById("e_message").value.trim() || "—"
+    interest: document.getElementById("e_interest").value || "General Enquiry",
+    service: document.getElementById("e_service").value || "General",
+    message: document.getElementById("e_message").value.trim(),
+    context: document.getElementById("e_message").value.trim()
   };
 
   const submitBtn = e.target.querySelector('button[type="submit"]');
@@ -645,7 +646,8 @@ document.getElementById("enquiryForm").addEventListener("submit", async (e)=>{
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(lead)
     });
-    if (!res.ok) throw new Error("Lead submit failed");
+    const result = await res.json().catch(() => ({}));
+    if (!res.ok || result.success === false) throw new Error(result.error || "Lead submit failed");
 
     document.getElementById("enquiryForm").classList.add("hidden");
     document.getElementById("enquirySuccess").classList.remove("hidden");
@@ -734,6 +736,24 @@ function switchAdminTab(tabId){
 document.querySelectorAll(".admin-tab").forEach(btn=>{
   btn.addEventListener("click", ()=> switchAdminTab(btn.dataset.admintab));
 });
+document.getElementById("clearLeadsUsersBtn")?.addEventListener("click", async ()=>{
+  const confirmed = confirm("Clear ALL saved Leads and Registered Users? Property listings and website content will NOT be deleted. This cannot be undone.");
+  if(!confirmed) return;
+  const btn = document.getElementById("clearLeadsUsersBtn");
+  if(btn) btn.disabled = true;
+  try{
+    const res = await fetch(`${API_BASE}/api/admin/clear-leads-users`, { method:"DELETE", headers: authHeader() });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(data.error || "Could not clear leads/users");
+    cachedLeads = []; cachedUsers = [];
+    try{ localStorage.removeItem(LEADS_CACHE_KEY); }catch(e){}
+    await Promise.all([renderLeads(), renderUsers()]);
+    updateAdminStats();
+    alert("Leads and users cleared. Property listings and website content are unchanged.");
+  }catch(err){ console.error(err); alert(err.message || "Failed to clear leads/users. Please check admin login and backend logs."); }
+  finally{ if(btn) btn.disabled = false; }
+});
+
 document.getElementById("refreshLeadsBtn").addEventListener("click", renderLeads);
 document.getElementById("refreshUsersBtn").addEventListener("click", renderUsers);
 document.getElementById("refreshContentBtn").addEventListener("click", renderManageList);

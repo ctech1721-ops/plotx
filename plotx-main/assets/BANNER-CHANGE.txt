@@ -1,9 +1,0 @@
-HOME PAGE BANNER
-================
-
-Replace this file with your own banner image:
-assets/home-banner.jpg
-
-Keep the filename exactly: home-banner.jpg
-Then redeploy the project.
-No dashboard upload is needed; the dashboard Site Banner editor is intentionally locked/removed.
