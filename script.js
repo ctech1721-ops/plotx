@@ -1184,3 +1184,31 @@ function resetIdleLock(){
 }
 ["click","keydown","mousemove","touchstart"].forEach(ev=>
   document.addEventListener(ev, ()=>{ if(adminSession.t) resetIdleLock(); }, {passive:true}));
+
+
+/* Responsive mobile header layout: logo left; hamburger + compact Enquiry right.
+   Account moves into the hamburger drawer on phone/tablet and returns on desktop. */
+(()=>{
+  const headerRow=document.querySelector('.header-top-row');
+  const nav=document.getElementById('mainNav');
+  const account=document.getElementById('userBtn');
+  const enquiry=document.getElementById('hdrEnquiry');
+  if(!headerRow||!nav||!account||!enquiry) return;
+  const accountHome=document.createComment('account button home');
+  const enquiryHome=document.createComment('enquiry button home');
+  account.parentNode.insertBefore(accountHome,account);
+  enquiry.parentNode.insertBefore(enquiryHome,enquiry);
+  const mobile=window.matchMedia('(max-width: 900px)');
+  function arrangeHeader(){
+    if(mobile.matches){
+      if(enquiry.parentElement!==headerRow) headerRow.appendChild(enquiry);
+      if(account.parentElement!==nav) nav.appendChild(account);
+    }else{
+      if(accountHome.parentNode) accountHome.parentNode.insertBefore(account,accountHome.nextSibling);
+      if(enquiryHome.parentNode) enquiryHome.parentNode.insertBefore(enquiry,enquiryHome.nextSibling);
+    }
+  }
+  arrangeHeader();
+  if(mobile.addEventListener) mobile.addEventListener('change',arrangeHeader);
+  else mobile.addListener(arrangeHeader);
+})();
