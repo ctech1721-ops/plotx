@@ -262,37 +262,50 @@ function buildCard(item){
   const price = String(item.price || item.price_range || "0");
   const description = item.description || "";
 
-  return `
-    <div class="listing-card" data-id="${item.id}" tabindex="0" role="button" aria-label="View details for ${escapeHtml(item.title)}">
-      <div class="listing-img-wrap">
-        <img src="${img}" alt="${escapeHtml(item.title)}" width="700" height="480" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${FALLBACK_CARD_IMG}'">
-        <span class="badge-purpose ${badgeClass(item.purpose)}">${(item.purpose||"").toUpperCase()}</span>
-        <span class="badge-cat">${item.category || ""}</span>
-        <span class="badge-id">ID: ${item.id}</span>
-        ${ratioBadge}
+ 
+return `
+  <div class="listing-card" data-id="${item.id}" tabindex="0" role="button" aria-label="View details for ${escapeHtml(item.title)}">
+    <div class="listing-img-wrap">
+      <img src="${img}" alt="${escapeHtml(item.title)}" width="700" height="480" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${FALLBACK_CARD_IMG}'">
+      <span class="badge-purpose ${badgeClass(item.purpose)}">${(item.purpose || "").toUpperCase()}</span>
+      <span class="badge-cat">${item.category || ""}</span>
+      <span class="badge-id">ID: ${item.id}</span>
+      ${ratioBadge}
+    </div>
+
+    <div class="listing-body">
+      <h3>${escapeHtml(item.title)}</h3>
+      <p class="listing-loc">${escapeHtml(item.location)}</p>
+      ${item.subcategory ? `<div class="listing-subcategory">${escapeHtml(item.subcategory)}</div>` : ""}
+
+      <div class="listing-price-row">
+        <span class="label">${priceLabel}</span>
+        <span class="price">${price.match(/^[\d,]+$/) ? "₹" + price : price}</span>
       </div>
-      <div class="listing-body">
-        <h3>${escapeHtml(item.title)}</h3>
-        <p class="listing-loc">${escapeHtml(item.location)}</p>
-        ${item.subcategory ? `<div class="listing-subcategory">${escapeHtml(item.subcategory)}</div>` : ""}
-        <div class="listing-price-row">
-          <span class="label">${priceLabel}</span>
-          <span class="price">${price.match(/^[\d,]+$/) ? "₹"+price : price}</span>
-        </div>
-        <div class="listing-area">
-          <span>Total Area</span><b>${item.area || 0} sqft</b>
-        </div>
-        <p class="listing-desc">${escapeHtml(description).slice(0,120)}${description.length>120?"...":""}</p>
-        <div class="tag-row">
-          ${features.map(f=>`<span class="feature-tag">• ${escapeHtml(f)}</span>`).join("")}
-        </div>
-        <div class="mobile-view-details">Tap to view full details</div>
-        <div class="card-actions">
-          <a href="tel:+919710918099" class="card-btn call-btn">Call Agent</a>
-          <button type="button" class="card-btn enquiry-btn" onclick="openEnquiry('${item.id}'); event.stopPropagation();">Enquiry</button>
-        </div>
+
+      <div class="listing-area">
+        <span>Total Area</span><b>${item.area || 0} sqft</b>
       </div>
-    </div>`;
+
+      <div class="tag-row">
+        ${features.map(f => `<span class="feature-tag">• ${escapeHtml(f)}</span>`).join("")}
+      </div>
+
+      <div class="card-actions">
+        <button type="button" class="card-btn view-btn"
+          onclick="event.stopPropagation(); openListingDetails('${item.id}')">
+          View Details
+        </button>
+
+        <a href="tel:+919710918099" class="card-btn call-btn">Call Agent</a>
+
+        <button type="button" class="card-btn enquiry-btn"
+          onclick="event.stopPropagation(); openEnquiry('${item.id}')">
+          Enquiry
+        </button>
+      </div>
+    </div>
+  </div>`;
 }
 
 /* ---------- LISTING DETAILS MODAL ---------- */
