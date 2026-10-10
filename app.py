@@ -1257,21 +1257,6 @@ def admin_login():
     })
 
 
-# =========================================================
-# ADMIN - UPLOADS
-# =========================================================
-
-@app.route(
-    "/uploads/<path:filename>"
-)
-def uploaded_file(filename):
-
-    return send_from_directory(
-        app.config["UPLOAD_FOLDER"],
-        filename
-    )
-
-
 
 # =========================================================
 # ADMIN - POSTERS
@@ -1287,13 +1272,13 @@ def admin_create_poster(admin):
 
     if not image:
         return jsonify({
+            "success": False,
             "error": "Image is required"
         }), 400
 
     if not title:
         title = "PlotX Property"
 
-    # Your Supabase poster table requires category
     if not category:
         category = "Property"
 
@@ -1305,11 +1290,23 @@ def admin_create_poster(admin):
             folder="plotx/posters"
         )
 
+       
         poster = Poster(
+            custom_id=request.form.get("custom_id"),
             title=title,
             image_url=result.get("secure_url"),
             public_id=result.get("public_id"),
-            category=category
+            category=category,
+            location=request.form.get("location"),
+            purpose=request.form.get("purpose"),
+            price=request.form.get("price"),
+            area=request.form.get("area"),
+            description=request.form.get("description"),
+            sub_category=request.form.get("sub_category"),
+            features=request.form.get("features"),
+            cleared=request.form.get("cleared"),
+            landowner_share=request.form.get("landowner_share") or None,
+            developer_share=request.form.get("developer_share") or None
         )
 
         db.session.add(poster)
@@ -1323,22 +1320,21 @@ def admin_create_poster(admin):
     except Exception as e:
         db.session.rollback()
 
-        # Remove newly uploaded image if database save fails
+        # Remove uploaded image if database save fails
         if result and result.get("public_id"):
             try:
                 cloudinary.uploader.destroy(
                     result["public_id"]
                 )
-            except Exception:
-                pass
+            except Exception as cleanup_error:
+                print("CLOUDINARY CLEANUP ERROR:", cleanup_error)
 
-        app.logger.exception("POSTER UPLOAD ERROR")
+        app.logger.exception("ADMIN POSTER CREATE FAILED")
 
         return jsonify({
-            "error": "Image upload failed"
+            "success": False,
+            "error": str(e)
         }), 500
-
-
 
 
 # =========================================================
