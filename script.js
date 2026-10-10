@@ -293,7 +293,7 @@ return `
 
       <div class="card-actions">
         <button type="button" class="card-btn view-btn"
-          onclick="event.stopPropagation(); openListingDetails('${item.id}')">
+          onclick="event.preventDefault(); event.stopPropagation(); openListingDetails('${item.id}')">
           View Details
         </button>
 
@@ -310,8 +310,15 @@ return `
 
 /* ---------- LISTING DETAILS MODAL ---------- */
 function openListingDetails(listingId){
-  const item = getAllListings().find(l => l.id === listingId);
-  if(!item) return;
+ 
+const item = getAllListings().find(
+  l => String(l.id) === String(listingId)
+);
+if (!item) {
+  console.error("Listing not found:", listingId);
+  return;
+}
+
 
   // Visitors can open property details without signing in.
 
