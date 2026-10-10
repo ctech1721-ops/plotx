@@ -326,9 +326,21 @@ const imagePath = item.image || item.image_url || "";
 const img = imagePath && imagePath.trim()
   ? optimizeImg(resolveAssetUrl(imagePath), 1100)
   : DEFAULT_BANNER;
-  const price = item.price || "0";
-  const priceLabel = item.purpose === "Rent" || item.purpose === "Lease" ? "Rental Value" : (item.purpose === "Joint Venture" ? "Deal Type" : "Financial Matrix");
-  const features = Array.isArray(item.features) ? item.features : [];
+  
+const price = String(item.price ?? item.price_range ?? item.priceRange ?? "0");
+
+const location = item.location || item.locality || item.address || "Location not specified";
+
+const area = item.area ?? item.total_area ?? item.totalArea ?? item.area_sqft ?? 0;
+
+const priceLabel = item.purpose === "Rent" || item.purpose === "Lease"
+  ? "Rental Value"
+  : item.purpose === "Joint Venture"
+    ? "Deal Type"
+    : "Financial Matrix";
+
+const features = Array.isArray(item.features) ? item.features : [];
+
 
   document.getElementById("listingDetailsContent").innerHTML = `
     <div class="details-image-wrap">
@@ -341,10 +353,10 @@ const img = imagePath && imagePath.trim()
         ${item.category ? `<span class="details-category">${escapeHtml(item.category)}</span>` : ""}
       </div>
       <h2>${escapeHtml(item.title || "Property Details")}</h2>
-      <p class="details-location">${escapeHtml(item.location || "Location not specified")}</p>
+      <p class="details-location">${escapeHtml(location)}</p>
       ${item.subcategory ? `<div class="details-subcategory">${escapeHtml(item.subcategory)}</div>` : ""}
       <div class="details-price-row"><span>${priceLabel}</span><strong>${price.match(/^[\d,]+$/) ? "₹"+price : escapeHtml(price)}</strong></div>
-      <div class="details-area"><span>Total Area</span><strong>${escapeHtml(String(item.area || 0))} sqft</strong></div>
+      <div class="details-area"><span>Total Area</span><strong>${escapeHtml(String(area))} sqft</strong></div>
       ${item.description ? `<div class="details-section"><h4>Property Description</h4><p>${escapeHtml(item.description)}</p></div>` : ""}
       ${features.length ? `<div class="details-section"><h4>Features & Highlights</h4><div class="details-features">${features.map(f=>`<span>• ${escapeHtml(f)}</span>`).join("")}</div></div>` : ""}
       ${item.landownerShare ? `<div class="details-section"><h4>Joint Venture Ratio</h4><p>${escapeHtml(String(item.landownerShare))}% Landowner / ${escapeHtml(String(item.developerShare || (100-item.landownerShare)))}% Developer</p></div>` : ""}
