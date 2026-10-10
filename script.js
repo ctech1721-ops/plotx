@@ -314,6 +314,9 @@ function openListingDetails(listingId) {
   const item = getAllListings().find(
     l => String(l.id) === String(listingId)
   );
+  console.log("CLICKED LISTING ID:", listingId);
+console.log("MATCHED ITEM:", item);
+console.log("MODAL CONTENT:", document.getElementById("listingDetailsContent"));
 
   if (!item) {
     console.error("Listing not found:", listingId);
