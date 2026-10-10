@@ -135,41 +135,55 @@ class Admin(db.Model):
 
 
 
+
 class Poster(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    custom_id = db.Column(db.String(255), nullable=True)
     title = db.Column(db.String(255), nullable=False)
-    category = db.Column(
-        db.String(255),
-        nullable=False,
-        default="Property"
-    )
-    image_url = db.Column(db.Text, nullable=False)
-    public_id = db.Column(db.String(255), nullable=True)
+    location = db.Column(db.String(255), nullable=True)
+    purpose = db.Column(db.String(255), nullable=True)
+    category = db.Column(db.String(255), nullable=False, default="Property")
+    sub_category = db.Column(db.String(255), nullable=True)
+    price = db.Column(db.String(255), nullable=True)
+    area = db.Column(db.String(255), nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    features = db.Column(db.Text, nullable=True)
+    cleared = db.Column(db.String(255), nullable=True)
+    landowner_share = db.Column(db.Integer, nullable=True)
+    developer_share = db.Column(db.Integer, nullable=True)
+    image_path = db.Column(db.String(255), nullable=True)
     created_at = db.Column(
         db.DateTime,
         default=datetime.datetime.utcnow
     )
+    image_url = db.Column(db.Text, nullable=True)
+    public_id = db.Column(db.String(255), nullable=True)
 
-    
-def to_dict(self):
-    return {
-        "id": self.id,
-        "title": self.title,
-        "category": self.category,
-        "image_url": self.image_url,
-        "public_id": self.public_id,
-        "created_at": (
-            self.created_at.isoformat()
-            if self.created_at else None
-        ),
-        "location": getattr(self, "location", None),
-        "purpose": getattr(self, "purpose", None),
-        "price": getattr(self, "price", None),
-        "area": getattr(self, "area", None),
-        "description": getattr(self, "description", None),
-        "sub_category": getattr(self, "sub_category", None),
-        "features": getattr(self, "features", None)
-    }
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "custom_id": self.custom_id,
+            "title": self.title,
+            "location": self.location,
+            "purpose": self.purpose,
+            "category": self.category,
+            "sub_category": self.sub_category,
+            "price": self.price,
+            "area": self.area,
+            "description": self.description,
+            "features": self.features,
+            "cleared": self.cleared,
+            "landowner_share": self.landowner_share,
+            "developer_share": self.developer_share,
+            "image_path": self.image_path,
+            "image_url": self.image_url,
+            "public_id": self.public_id,
+            "created_at": (
+                self.created_at.isoformat()
+                if self.created_at else None
+            )
+        }
+
 
 
 
