@@ -308,16 +308,22 @@ return `
   </div>`;
 }
 
+
 /* ---------- LISTING DETAILS MODAL ---------- */
-function openListingDetails(listingId){
- 
-const item = getAllListings().find(
-  l => String(l.id) === String(listingId)
-);
-if (!item) {
-  console.error("Listing not found:", listingId);
-  return;
-}
+function openListingDetails(listingId) {
+  const item = getAllListings().find(
+    l => String(l.id) === String(listingId)
+  );
+
+  if (!item) {
+    console.error("Listing not found:", listingId);
+    return;
+  }
+
+  console.log("PROPERTY DATA:", item);
+
+  
+
 
 
   // Visitors can open property details without signing in.
