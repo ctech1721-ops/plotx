@@ -814,8 +814,8 @@ if (res.status === 401) {
       <td data-label="Mobile">${escapeHtml(l.mobile)}</td>
       <td data-label="Interest">${escapeHtml(l.interest)}</td>
       <td data-label="Service">${escapeHtml(l.service)}</td>
-      <td data-label="Message">${escapeHtml(l.context)}</td>
-      <td data-label="Date">${fmtDateTime(l.date)}</td>
+      <td data-label="Message"><button type="button" class="lead-view-message" data-lead-message="${escapeHtml(l.context || l.source_context || l.message || '')}">View</button></td>
+      <td data-label="Date">${fmtDateTime(l.created_at || l.date || l.created)}</td>
     </tr>
   `).join("");
   await updateAdminStats();
@@ -1185,6 +1185,24 @@ function resetIdleLock(){
 ["click","keydown","mousemove","touchstart"].forEach(ev=>
   document.addEventListener(ev, ()=>{ if(adminSession.t) resetIdleLock(); }, {passive:true}));
 
+
+/* Dashboard message viewer */
+(function(){
+  const modal=document.getElementById('leadMessageModal');
+  const textEl=document.getElementById('leadMessageText');
+  const closeBtn=document.getElementById('leadMessageClose');
+  if(!modal || !textEl || !closeBtn) return;
+  document.getElementById('leadsTableBody')?.addEventListener('click', event=>{
+    const btn=event.target.closest('[data-lead-message]');
+    if(!btn) return;
+    textEl.textContent=btn.getAttribute('data-lead-message') || 'No message provided.';
+    modal.classList.remove('hidden');
+  });
+  const close=()=>modal.classList.add('hidden');
+  closeBtn.addEventListener('click',close);
+  modal.addEventListener('click',event=>{if(event.target===modal) close();});
+  document.addEventListener('keydown',event=>{if(event.key==='Escape') close();});
+})();
 
 /* Responsive mobile header layout: logo left; hamburger + compact Enquiry right.
    Account moves into the hamburger drawer on phone/tablet and returns on desktop. */
