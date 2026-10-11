@@ -9,6 +9,39 @@
   const API_BASE = window.PLOTX_API_BASE || 'https://plotx-dmv2.onrender.com';
   const baseGoTo = window.goTo;
 
+
+  // Villa promotion popup: shown after Get in Touch succeeds and on every reload for a saved user.
+  document.body.insertAdjacentHTML('beforeend', `
+    <div id="villaPromoModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="villaPromoTitle">
+      <div class="villa-promo-card">
+        <button type="button" id="villaPromoClose" class="villa-promo-close" aria-label="Close promotion">×</button>
+        <img class="villa-promo-image" src="assets/home-banner.jpg" alt="3BHK duplex villas in a gated community">
+        <div class="villa-promo-copy">
+          <p class="villa-promo-kicker">PLOT X REALTY</p>
+          <h3 id="villaPromoTitle">Upgrade Your Family’s Lifestyle</h3>
+          <p class="villa-promo-feature">3BHK DUPLEX VILLAS</p>
+          <p class="villa-promo-feature">GATED COMMUNITY</p>
+          <div class="villa-promo-actions">
+            <button type="button" id="villaPromoEnquiry" class="gold-btn">Enquiry</button>
+            <a class="outline-btn" href="tel:+919710918099">Call</a>
+          </div>
+        </div>
+      </div>
+    </div>`);
+
+  function showVillaPromo() {
+    const modal = $('villaPromoModal');
+    if (modal) modal.classList.remove('hidden');
+  }
+  function closeVillaPromo() {
+    const modal = $('villaPromoModal');
+    if (modal) modal.classList.add('hidden');
+  }
+  $('villaPromoClose').addEventListener('click', closeVillaPromo);
+  $('villaPromoModal').addEventListener('click', event => { if (event.target.id === 'villaPromoModal') closeVillaPromo(); });
+  $('villaPromoEnquiry').addEventListener('click', () => { closeVillaPromo(); if (typeof window.openEnquiry === 'function') window.openEnquiry(''); });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') closeVillaPromo(); });
+
   function currentUser() {
     try { return JSON.parse(localStorage.getItem(PROFILE) || 'null'); }
     catch (_) { return null; }
@@ -126,6 +159,7 @@
       button.textContent = 'Saved';
       setTimeout(() => {
         $('getInTouchModal').classList.add('hidden');
+        showVillaPromo();
         error.className = 'login-error';
         error.textContent = '';
         button.disabled = false;
@@ -165,5 +199,7 @@
     window.setTimeout(() => {
       if (!currentUser()) openForm();
     }, 250);
+  } else {
+    window.setTimeout(showVillaPromo, 350);
   }
 })();
