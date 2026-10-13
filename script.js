@@ -1230,3 +1230,83 @@ function resetIdleLock(){
   if(mobile.addEventListener) mobile.addEventListener('change',arrangeHeader);
   else mobile.addListener(arrangeHeader);
 })();
+
+
+/* ============ Reviews rail: very slow auto-scroll + fast mouse/touch drag ============ */
+(function initReviewsRail(){
+  const rail = document.getElementById("reviewsRail");
+  const track = document.getElementById("reviewsTrack");
+  if(!rail || !track) return;
+
+  // Duplicate the cards once so the slow automatic motion loops seamlessly.
+  const originals = Array.from(track.children);
+  originals.forEach(card => {
+    const clone = card.cloneNode(true);
+    clone.setAttribute("aria-hidden","true");
+    track.appendChild(clone);
+  });
+
+  let paused = false;
+  let dragging = false;
+  let pointerStartX = 0;
+  let scrollStart = 0;
+  let lastPointerX = 0;
+  let lastTime = 0;
+  let dragVelocity = 0;
+
+  rail.addEventListener("mouseenter", () => { paused = true; });
+  rail.addEventListener("mouseleave", () => { if(!dragging) paused = false; });
+  rail.addEventListener("focusin", () => { paused = true; });
+  rail.addEventListener("focusout", () => { if(!dragging) paused = false; });
+
+  rail.addEventListener("pointerdown", event => {
+    if(event.pointerType === "mouse" && event.button !== 0) return;
+    dragging = true;
+    paused = true;
+    pointerStartX = event.clientX;
+    lastPointerX = event.clientX;
+    scrollStart = rail.scrollLeft;
+    lastTime = performance.now();
+    dragVelocity = 0;
+    rail.classList.add("is-dragging");
+    try { rail.setPointerCapture(event.pointerId); } catch(e) {}
+  });
+  rail.addEventListener("pointermove", event => {
+    if(!dragging) return;
+    const now = performance.now();
+    const dx = event.clientX - lastPointerX;
+    rail.scrollLeft = scrollStart - (event.clientX - pointerStartX);
+    const elapsed = Math.max(1, now - lastTime);
+    dragVelocity = dx / elapsed;
+    lastPointerX = event.clientX;
+    lastTime = now;
+  });
+  function endDrag(){
+    if(!dragging) return;
+    dragging = false;
+    rail.classList.remove("is-dragging");
+    // A short inertial glide makes a quick swipe feel natural on touch screens.
+    if(Math.abs(dragVelocity) > 0.12){
+      rail.scrollLeft -= dragVelocity * 180;
+    }
+    paused = false;
+  }
+  rail.addEventListener("pointerup", endDrag);
+  rail.addEventListener("pointercancel", endDrag);
+  rail.addEventListener("lostpointercapture", endDrag);
+
+  // Auto-scroll is intentionally gentle (~12 pixels/second at 60fps).
+  let previous = 0;
+  function animate(timestamp){
+    if(!previous) previous = timestamp;
+    const elapsed = Math.min(40, timestamp - previous);
+    previous = timestamp;
+    if(!paused && !dragging && !document.hidden){
+      rail.scrollLeft += elapsed * 0.055;
+      const loopPoint = track.scrollWidth / 2;
+      if(loopPoint > 0 && rail.scrollLeft >= loopPoint) rail.scrollLeft -= loopPoint;
+    }
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+})();
